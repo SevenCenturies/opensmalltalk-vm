@@ -679,6 +679,12 @@ CogAbstractInstruction >> concretizeMovePatcheableC32R [
 	self subclassResponsibility 
 ]
 
+{ #category : #simulation }
+CogAbstractInstruction >> configureStackAlignment [
+	
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 CogAbstractInstruction >> dependent [
 	^dependent
@@ -949,15 +955,6 @@ CogAbstractInstruction >> genSwapR: regA R: regB Scratch: regTmp [
 CogAbstractInstruction >> genWriteCResultIntoReg: abstractRegister [
 	| cResultReg |
 	cResultReg := self cResultRegister.
-	abstractRegister ~= cResultReg ifTrue:
-		[cogit gen: MoveRR operand: cResultReg operand: abstractRegister]
-]
-
-{ #category : #abi }
-CogAbstractInstruction >> genWriteCSecondResultIntoReg: abstractRegister [
-	<option: #LowcodeVM>
-	| cResultReg |
-	cResultReg := self cResultRegisterHigh.
 	abstractRegister ~= cResultReg ifTrue:
 		[cogit gen: MoveRR operand: cResultReg operand: abstractRegister]
 ]

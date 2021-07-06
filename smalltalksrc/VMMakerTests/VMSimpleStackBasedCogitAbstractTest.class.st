@@ -387,6 +387,13 @@ VMSimpleStackBasedCogitAbstractTest >> initialCodeSize [
 	^ 4 * 1024
 ]
 
+{ #category : #helpers }
+VMSimpleStackBasedCogitAbstractTest >> initializationOptions [
+	
+	^ super initializationOptions, {
+		#bytecodeTableInitializer. #initializeBytecodeTableForSqueakV3PlusClosures}
+]
+
 { #category : #running }
 VMSimpleStackBasedCogitAbstractTest >> initializeInitialStackFrame [
 
@@ -418,10 +425,26 @@ VMSimpleStackBasedCogitAbstractTest >> instructionPointer [
 	^ self readRegister: machineSimulator instructionPointerRegister
 ]
 
+{ #category : #helpers }
+VMSimpleStackBasedCogitAbstractTest >> interpreterClass [
+
+	^ CogVMSimulatorLSB
+]
+
 { #category : #running }
 VMSimpleStackBasedCogitAbstractTest >> jitCompilerClass [
 
 	^ SimpleStackBasedCogit
+]
+
+{ #category : #helpers }
+VMSimpleStackBasedCogitAbstractTest >> jitMethod: aPharoCompiledMethod selector: aSelectorOop [
+
+	| methodOop |
+	"We are using V3 bytecode, so we need to recompile the method"
+	methodOop := self createMethodOopFromPharoMethod:
+		             aPharoCompiledMethod.
+	^ cogit cog: methodOop selector: aSelectorOop
 ]
 
 { #category : #running }
@@ -453,25 +476,6 @@ VMSimpleStackBasedCogitAbstractTest >> memoryClass [
 	^ self wordSize = 4
 		ifTrue: [ Spur32BitCoMemoryManager ]
 		ifFalse: [ Spur64BitCoMemoryManager ]
-]
-
-{ #category : #helpers }
-VMSimpleStackBasedCogitAbstractTest >> newInterpreter [
-
-	| theMemory |
-	theMemory := self newMemory.
-
-	CogVMSimulatorLSB
-		initializeWithOptions: {
-			#BytesPerWord. 8.
-			#ObjectMemory. theMemory class name.
-			#bytecodeTableInitializer. #initializeBytecodeTableForSqueakV3PlusClosures}
-		objectMemoryClass: theMemory class.
-		
-		
-	^ CogVMSimulatorLSB basicNew
-		objectMemory: theMemory;
-		basicInitialize
 ]
 
 { #category : #running }
@@ -660,7 +664,7 @@ VMSimpleStackBasedCogitAbstractTest >> returnValue [
 { #category : #helpers }
 VMSimpleStackBasedCogitAbstractTest >> runFrom: startAddress until: endAddress [
 
-	^ self runFrom: startAddress until: endAddress timeout: 1000. "microseconds"
+	^ self runFrom: startAddress until: endAddress timeout: 100000. "microseconds"
 
 ]
 

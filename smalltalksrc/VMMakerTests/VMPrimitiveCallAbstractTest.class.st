@@ -4,8 +4,7 @@ Class {
 	#instVars : [
 		'baseMethodIP',
 		'baseFrame',
-		'baseMethod',
-		'v3Method'
+		'baseMethod'
 	],
 	#category : #'VMMakerTests-JitTests'
 }
@@ -77,22 +76,6 @@ VMPrimitiveCallAbstractTest >> jitMethod: aPharoCompiledMethod [
 	^ self jitMethod: aPharoCompiledMethod selector: memory nilObject
 ]
 
-{ #category : #helpers }
-VMPrimitiveCallAbstractTest >> jitMethod: aPharoCompiledMethod selector: aSelectorOop [
-
-	| methodOop |
-	
-	"We are using V3 bytecode, so we need to recompile the method"
-	v3Method := aPharoCompiledMethod methodClass compiler
-							encoderClass: EncoderForV3PlusClosures;
-							options: #(-optionFullBlockClosure);
-							compile: aPharoCompiledMethod sourceCode.
-	
-	methodOop := methodBuilder fillFromPharoMethod: v3Method; buildMethod.
-
-	^ cogit cog: methodOop selector: aSelectorOop
-]
-
 { #category : #'methods under test' }
 VMPrimitiveCallAbstractTest >> jitOptions [
 
@@ -157,6 +140,16 @@ VMPrimitiveCallAbstractTest >> methodThatCallPrimitive159 [
 	<primitive: 159>
 
 	^ 42 
+]
+
+{ #category : #'methods under test' }
+VMPrimitiveCallAbstractTest >> methodThatCallPrimitive173: anArg [
+
+	"This method is used to test the invocation of a primitive.
+	The primitive to invoke is later changed in the primitive table of the interpreter used in the test"
+	<primitive: 173>
+	
+	^ 42
 ]
 
 { #category : #'methods under test' }
